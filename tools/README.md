@@ -4,16 +4,23 @@ Te skrypty czytają archiwa skryptów z własnego dumpa gry i budują dane pomoc
 
 ## Wymagania i uruchomienie
 
-Potrzebny jest Python 3.11+ oraz osobny checkout [loicfrance/mahoyo_tools](https://github.com/loicfrance/mahoyo_tools). `mahoyo_context.py` importuje stamtąd `mahoyo_tools.mzp` i `mahoyo_tools.mzx`; pliki tych modułów nie są kopiowane do tego repozytorium. Ustaw w `PYTHONPATH` **katalog nadrzędny** checkoutu upstream, tak aby Python widział katalog pakietu `mahoyo_tools`:
+Potrzebny jest Python 3.11+ oraz submoduł [loicfrance/mahoyo_tools](https://github.com/loicfrance/mahoyo_tools) przypięty w katalogu `mahoyo_tools/`. `mahoyo_context.py` importuje z niego `mahoyo_tools.mzp` i `mahoyo_tools.mzx`. To repozytorium zapisuje adres i commit submodułu, nie kopię jego plików. Przypięta wersja upstream nie zawiera pliku `LICENSE`; dodanie submodułu nie zmienia tego stanu.
+
+Przy nowym klonowaniu użyj `git clone --recurse-submodules https://github.com/WorkingWarrior/mahoyo.git`. W już sklonowanym repo uruchom:
 
 ```bash
-export PYTHONPATH="/ścieżka/do/katalogu/z/mahoyo_tools${PYTHONPATH:+:$PYTHONPATH}"
+git submodule update --init
+```
+
+Z katalogu głównego repozytorium:
+
+```bash
 python tools/mahoyo_context.py 148 \
   --text /ścieżka/do/własnego/dumpa/script_text.mrg \
   --scripts /ścieżka/do/własnego/dumpa/allscr.mrg
 ```
 
-Przykładowo, jeśli checkout upstream jest w `/mnt/Dane/Development/mahoyo_tools`, ustaw `PYTHONPATH=/mnt/Dane/Development`. Sam katalog `mahoyo_tools` nie wystarcza do importu `mahoyo_tools.mzp`. W środowisku z inną lokalizacją archiwów podaj jawnie `--text`, `--scripts` i, przy imporcie PL, `--pl-dir`; domyślne ścieżki w skryptach odnoszą się do lokalnego środowiska autora.
+`PYTHONPATH` nie trzeba ustawiać. W środowisku z inną lokalizacją archiwów podaj jawnie `--text`, `--scripts` i, przy imporcie PL, `--pl-dir`; domyślne ścieżki w skryptach odnoszą się do lokalnego środowiska autora.
 
 ## `mahoyo_context.py`
 
@@ -48,8 +55,7 @@ Tryb `strings` eksportuje tylko `strings.jsonl`. Tryb bez podkomendy eksportuje 
 ## Testy
 
 ```bash
-PYTHONPATH="/ścieżka/do/katalogu/z/mahoyo_tools" \
-  python -m unittest discover -s tools -p 'test_mahoyo_*.py'
+python -m unittest discover -s tools -p 'test_mahoyo_*.py'
 ```
 
 Testy na prawdziwych archiwach uruchamiają się, jeśli domyślne lokalne ścieżki do dumpa są dostępne; pozostałe działają na danych przykładowych.
