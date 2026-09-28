@@ -1,0 +1,42 @@
+# Game dumps and extracted content
+*.mrg
+*.nsp
+*.xci
+*.nca
+romfs/
+RomFS/
+exefs/
+ExeFS/
+NEW/
+H/
+TRANSLATED/
+
+# Generated localization data
+mahoyo_project/
+strings.jsonl
+occurrences.jsonl
+manifest.json
+
+# Voice and other game audio assets
+*.wav
+*.ogg
+*.mp3
+*.flac
+*.opus
+*.aac
+*.m4a
+*.wem
+*.bnk
+*.bfstm
+*.brstm
+*.hca
+*.adx
+*.at9
+*.fsb
+*.acb
+*.awb
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/

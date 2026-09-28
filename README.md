@@ -9,3 +9,7 @@ Prosimy o zwrócenie uwagi na fakt, że nie jest to finalne tłumaczenie, a prac
 ## Podziękowania
 
 Type-Moon za wydanie tej [gry](http://typemoon.com/products/mahoyo/)!
+
+## Tooling
+
+Narzędzia do analizy skryptów i eksportu danych tłumaczeniowych opisano w [tools/README.md](tools/README.md).
