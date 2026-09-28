@@ -108,21 +108,40 @@ def load_pl_translations(pl_dir: Path, texts: list[dict[str, object]]) -> dict[i
 
 
 def load_translation_jsonl(path: Path, texts: list[dict[str, object]]) -> dict[int, str]:
-    """Load the public sparse translation file for repeatable corpus exports."""
+    """Load PL from a complete translation table or the earlier sparse format."""
     translated: dict[int, str] = {}
+    seen: set[int] = set()
+    full_format: bool | None = None
     with path.open(encoding="utf-8") as stream:
         for line_number, line in enumerate(stream, 1):
             row = json.loads(line)
-            if not isinstance(row, dict) or set(row) != {"text_id", "pl"}:
+            if not isinstance(row, dict) or not {"text_id", "pl"} <= set(row):
                 raise ValueError(f"{path.name}:{line_number}: expected text_id and pl")
+            is_full = {"ja", "en", "occurrences"} <= set(row)
+            if set(row) != ({"text_id", "ja", "en", "pl", "occurrences"}
+                            if is_full else {"text_id", "pl"}):
+                raise ValueError(f"{path.name}:{line_number}: invalid record fields")
+            if full_format is not None and is_full != full_format:
+                raise ValueError(f"{path.name}:{line_number}: mixed record formats")
+            full_format = is_full
             text_id, pl = row["text_id"], row["pl"]
             if type(text_id) is not int or not 0 <= text_id < len(texts):
                 raise ValueError(f"{path.name}:{line_number}: invalid text_id")
-            if not isinstance(pl, str) or not pl.strip():
-                raise ValueError(f"{path.name}:{line_number}: empty or invalid PL")
-            if text_id in translated:
+            if text_id in seen:
                 raise ValueError(f"{path.name}:{line_number}: duplicate text_id {text_id}")
-            translated[text_id] = pl
+            seen.add(text_id)
+            if is_full:
+                if (not isinstance(row["ja"], str) or not isinstance(row["en"], str)
+                        or not isinstance(row["occurrences"], list)):
+                    raise ValueError(f"{path.name}:{line_number}: invalid full record")
+                if pl is not None and (not isinstance(pl, str) or not pl.strip()):
+                    raise ValueError(f"{path.name}:{line_number}: invalid PL")
+            elif not isinstance(pl, str) or not pl.strip():
+                raise ValueError(f"{path.name}:{line_number}: empty or invalid PL")
+            if pl is not None:
+                translated[text_id] = pl
+    if full_format and seen != set(range(len(texts))):
+        raise ValueError(f"{path.name}: full translation table has missing text_id")
     return translated
 
 
@@ -134,12 +153,18 @@ def iter_string_records(texts: list[dict[str, object]]) -> Iterator[dict[str, ob
         yield {"text_id": text_id, "ja": text["ja"], "en": text["en"]}
 
 
-def iter_translation_records(pl_by_id: dict[int, str]) -> Iterator[dict[str, object]]:
-    """Yield sparse, indexed PL records without changing translation text."""
-    for text_id, pl in sorted(pl_by_id.items()):
-        if type(text_id) is not int or text_id < 0 or not isinstance(pl, str) or not pl.strip():
+def iter_translation_records(texts: list[dict[str, object]],
+                             pl_by_id: dict[int, str],
+                             occurrences_by_id: dict[int, list[dict[str, object]]]
+                             ) -> Iterator[dict[str, object]]:
+    """Yield one translator-ready record per string, including every use."""
+    for string in iter_string_records(texts):
+        text_id = string["text_id"]
+        pl = pl_by_id.get(text_id)
+        if pl is not None and (not isinstance(pl, str) or not pl.strip()):
             raise ValueError(f"Invalid translation for text_id {text_id}")
-        yield {"text_id": text_id, "pl": pl}
+        yield {**string, "pl": pl,
+               "occurrences": occurrences_by_id.get(text_id, [])}
 
 
 def iter_corpus_records(texts: list[dict[str, object]], scripts: list[Script],
@@ -173,13 +198,19 @@ def iter_corpus_records(texts: list[dict[str, object]], scripts: list[Script],
                 record = {
                     "id": record_id,
                     "text_id": text_id,
+                    "scene": script.name,
                     "script": script.name,
                     "command_index": command.command_index,
                     "command_offset": command.byte_offset,
                     "zm_command": command.command,
                     **{key: hit[key] for key in voice_metadata(None)},
+                    "speaker_id": None,
+                    "voice_source": (f"preceding {hit['candidate_voice_commands'][0]['command']}; "
+                                     "association unverified")
+                    if hit.get("candidate_voice_id") is not None else None,
                     "context_before": before,
                     "context_after": after,
+                    "context_order": "script source",
                 }
                 if legacy_inline_text:
                     record.update(ja=texts[text_id]["ja"], en=texts[text_id]["en"],
@@ -288,11 +319,18 @@ def write_strings(output: Path, texts: list[dict[str, object]]) -> set[int]:
     return string_ids
 
 
-def write_translation(output: Path, pl_by_id: dict[int, str],
-                      string_ids: set[int]) -> None:
-    """Write only translated IDs, atomically."""
+def write_translation(output: Path, texts: list[dict[str, object]],
+                      pl_by_id: dict[int, str], string_ids: set[int],
+                      occurrences_path: Path) -> None:
+    """Write the complete translator-ready table, atomically."""
     if not pl_by_id.keys() <= string_ids:
         raise ValueError("PL contains text_id absent from script_text")
+    occurrences_by_id: dict[int, list[dict[str, object]]] = {}
+    with occurrences_path.open(encoding="utf-8") as stream:
+        for line in stream:
+            occurrence_record = json.loads(line)
+            occurrences_by_id.setdefault(occurrence_record["text_id"], []).append(
+                occurrence_record)
     output.parent.mkdir(parents=True, exist_ok=True)
     temp_path: Path | None = None
     try:
@@ -300,7 +338,7 @@ def write_translation(output: Path, pl_by_id: dict[int, str],
                                          dir=output.parent, prefix=f".{output.name}.",
                                          delete=False) as stream:
             temp_path = Path(stream.name)
-            for record in iter_translation_records(pl_by_id):
+            for record in iter_translation_records(texts, pl_by_id, occurrences_by_id):
                 stream.write(json.dumps(record, ensure_ascii=False,
                                         separators=(",", ":")) + "\n")
         os.replace(temp_path, output)
@@ -347,7 +385,6 @@ def export_project(output_dir: Path, texts: list[dict[str, object]],
     """Write canonical strings, context occurrences and a path-free manifest."""
     output_dir.mkdir(parents=True, exist_ok=True)
     string_ids = write_strings(output_dir / "strings.jsonl", texts)
-    write_translation(output_dir / "translation.jsonl", pl_by_id, string_ids)
     occurrence_stats = export_corpus(output_dir / "occurrences.jsonl", texts,
                                      scripts, pl_by_id, context)
     audit = audit_occurrences(output_dir / "occurrences.jsonl", string_ids, pl_by_id)
@@ -355,10 +392,13 @@ def export_project(output_dir: Path, texts: list[dict[str, object]],
         raise ValueError("Occurrence count changed between export and audit")
     if audit["zero"] + audit["one"] + audit["more_than_one"] != len(string_ids):
         raise ValueError("Occurrence distribution does not cover all strings")
+    write_translation(output_dir / "translation.jsonl", texts, pl_by_id,
+                      string_ids, output_dir / "occurrences.jsonl")
     manifest = {
-        "format_version": 2,
+        "format_version": 3,
         "strings": len(string_ids),
         "occurrences": audit["occurrences"],
+        "translation_records": len(string_ids),
         "translated_strings": len(pl_by_id),
         "unused_text_ids": audit["zero"],
         "source_order_context": True,
@@ -441,7 +481,7 @@ def project_main(argv: list[str]) -> int:
     translation_source = parser.add_mutually_exclusive_group()
     translation_source.add_argument("--pl-dir", type=Path)
     translation_source.add_argument("--translation", type=Path,
-                                    help="existing sparse translation.jsonl")
+                                    help="existing translation.jsonl (complete or earlier sparse format)")
     translation_source.add_argument("--no-pl", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_PROJECT_DIR)
     parser.add_argument("--context", type=int, default=3, metavar="N")

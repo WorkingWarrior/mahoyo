@@ -30,7 +30,7 @@ Narzędzie wyszukuje `text_id` w `allscr.mrg` i pokazuje komendę `_ZM`, sąsied
 
 ## `mahoyo_export_corpus.py`
 
-`String` to jednostka tekstu identyfikowana przez `text_id`. `Occurrence` to użycie tego stringa w komendzie skryptu, wskazujące go przez `text_id` i przechowujące miejsce użycia oraz kontekst. Jeden string może mieć wiele occurrences, ale ma najwyżej jedną wartość PL w `translation.jsonl`. Przy migracji z lokalnych kanonicznych plików `Chapter*.json` wygeneruj zestaw w katalogu głównym repo:
+`String` to jednostka tekstu identyfikowana przez `text_id`. `Occurrence` to użycie tego stringa w komendzie skryptu, wskazujące go przez `text_id` i przechowujące miejsce użycia oraz kontekst. Jeden string może mieć wiele occurrences, ale ma jedną wartość PL w `translation.jsonl`. Przy migracji z lokalnych kanonicznych plików `Chapter*.json` wygeneruj zestaw w katalogu głównym repo:
 
 ```bash
 python tools/mahoyo_export_corpus.py project \
@@ -42,8 +42,8 @@ python tools/mahoyo_export_corpus.py project \
 
 `--pl-dir` wskazuje katalog z kanonicznymi `Chapter*.json`. W nowym formacie
 eksporter używa jawnego `text_id`; w starym dopasowuje całe sekwencje JA do
-tabeli z gry. Pusty lub zawierający tylko białe znaki PL nie jest eksportowany.
-`*_AUTOTRANSLATED.json` są pomijane. `--no-pl` tworzy pusty `translation.jsonl`.
+tabeli z gry. Pusty lub zawierający tylko białe znaki PL staje się `null`.
+`*_AUTOTRANSLATED.json` są pomijane. `--no-pl` tworzy pełny `translation.jsonl` z `pl: null`.
 Pliki źródłowe nie są zmieniane. Przy kolejnych eksportach użyj
 `--translation translation.jsonl` zamiast `--pl-dir`, aby zachować bieżące
 polskie zmiany. Eksporter wczytuje tłumaczenie przed zapisaniem plików, więc
@@ -52,9 +52,9 @@ może ono leżeć w katalogu wyjściowym.
 Projekt zawiera:
 
 - `strings.jsonl`: jeden rekord na każde `text_id`, także nieużywane; pola `text_id`, `ja`, `en`.
-- `translation.jsonl`: tylko niepuste kanoniczne PL; pola `text_id`, `pl`, bez rekordów z `pl: null`.
+- `translation.jsonl`: jeden pełny rekord na każde `text_id`; pola `text_id`, `ja`, `en`, `pl` i `occurrences`. Każde occurrence zawiera `id`, scenę/skrypt, pozycję komendy, kontekst w `text_id`, voice i metadane prawdopodobnego mówcy. Nieużywany string ma pustą listę occurrences. To gotowy widok do tłumaczenia bez ręcznego łączenia plików.
 - `occurrences.jsonl`: jeden rekord na użycie w `_ZM`; zawiera `id` (`script:command_index:text_id`), `text_id`, lokalizację, metadane głosu i prawdopodobnego speakera oraz `context_before` i `context_after` jako listy sąsiednich `text_id`. Nie zawiera kopii `ja`, `en` ani `pl`; tekst pobiera się ze `strings.jsonl` przez `text_id`.
-- `manifest.json`: wersja formatu, liczniki stringów, occurrences i tłumaczeń, rozkład użyć, szerokość kontekstu oraz SHA-256 archiwów wejściowych i trzech pozostałych plików. Nie zawiera bezwzględnych ścieżek źródeł.
+- `manifest.json`: wersja formatu, liczniki stringów, occurrences, rekordów translacji i niepustych PL, rozkład użyć, szerokość kontekstu oraz SHA-256 archiwów wejściowych i trzech pozostałych plików. Nie zawiera bezwzględnych ścieżek źródeł.
 
 Kontekst wynika z kolejności w źródłowym skrypcie (**source-order**), a nie z gwarantowanej kolejności wykonania w grze (**runtime-flow**). Domyślnie obejmuje trzy sąsiednie komendy `_ZM` z każdej strony; `--context N` zmienia tę liczbę.
 

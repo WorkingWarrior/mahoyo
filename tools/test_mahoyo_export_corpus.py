@@ -41,6 +41,10 @@ class ExportUnitTests(unittest.TestCase):
             self.assertEqual(first[field], second[field], field)
         self.assertEqual(first["voice_id"], "A10_1_2_0003")
         self.assertEqual(first["speaker"], "aoko")
+        self.assertEqual(first["speaker_confidence"], "probable")
+        self.assertEqual(first["voice_source"],
+                         "preceding _VPLY(A10_1_2_0003,1); association unverified")
+        self.assertEqual(first["context_order"], "script source")
         self.assertEqual(first["context_before"], [0])
         self.assertEqual(first["context_after"], [3])
         self.assertEqual(rows[3]["context_before"], [1, 2])
@@ -89,7 +93,8 @@ class ExportUnitTests(unittest.TestCase):
             self.assertEqual(manifests[0], manifests[1])
             manifest = manifests[0]
             self.assertEqual((manifest["strings"], manifest["occurrences"]), (3, 3))
-            self.assertEqual(manifest["format_version"], 2)
+            self.assertEqual(manifest["format_version"], 3)
+            self.assertEqual(manifest["translation_records"], 3)
             self.assertEqual((manifest["translated_strings"], manifest["unused_text_ids"]), (1, 1))
             self.assertEqual(manifest["occurrence_distribution"],
                              {"zero": 1, "one": 1, "more_than_one": 1,
@@ -117,7 +122,12 @@ class ExportUnitTests(unittest.TestCase):
                                 (outputs[0] / "translation.jsonl").read_text().splitlines()]
             self.assertEqual(len(string_rows), manifest["strings"])
             self.assertEqual(len(occurrence_rows), manifest["occurrences"])
-            self.assertEqual(translation_rows, [{"text_id": 0, "pl": "PL 0"}])
+            self.assertEqual([row["text_id"] for row in translation_rows], [0, 1, 2])
+            self.assertEqual([row["pl"] for row in translation_rows], ["PL 0", None, None])
+            self.assertEqual(translation_rows[0]["ja"], "JA 0")
+            self.assertEqual(len(translation_rows[0]["occurrences"]), 2)
+            self.assertEqual(translation_rows[2]["occurrences"], [])
+            self.assertEqual(translation_rows[0]["occurrences"][0]["script"], "sample")
             self.assertEqual({r["text_id"] for r in occurrence_rows}, {0, 1})
 
     def test_pl_loader_uses_validated_contiguous_indices(self):
@@ -152,7 +162,7 @@ class ExportUnitTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Overlapping chapter ranges"):
                 load_pl_translations(root, texts)
 
-    def test_sparse_translation_reload(self):
+    def test_translation_reload(self):
         texts = [{"text_id": i, "ja": f"JA {i}", "en": f"EN {i}"} for i in range(2)]
         with TemporaryDirectory() as directory:
             path = Path(directory) / "translation.jsonl"
@@ -162,6 +172,11 @@ class ExportUnitTests(unittest.TestCase):
                             '{"text_id":1,"pl":"another"}\n', encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "duplicate text_id"):
                 load_translation_jsonl(path, texts)
+            path.write_text(
+                '{"text_id":0,"ja":"JA 0","en":"EN 0","pl":null,"occurrences":[]}\n'
+                '{"text_id":1,"ja":"JA 1","en":"EN 1","pl":"  PL  ","occurrences":[]}\n',
+                encoding="utf-8")
+            self.assertEqual(load_translation_jsonl(path, texts), {1: "  PL  "})
 
     def test_pl_conflict_is_rejected(self):
         texts = [{"text_id": 0, "ja": "JA 0", "en": "EN 0"}]

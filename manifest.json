@@ -1,6 +1,6 @@
 {
   "context_zm_commands_per_side": 3,
-  "format_version": 2,
+  "format_version": 3,
   "occurrence_distribution": {
     "max_occurrences": 2,
     "more_than_one": 9,
@@ -9,9 +9,9 @@
   },
   "occurrences": 23550,
   "output_sha256": {
-    "occurrences.jsonl": "ca54cd72c698c031f35d88368f4e31f242c76820dbaf8de352c39cdeaa0879d0",
+    "occurrences.jsonl": "f35a8cc2e406ffd8f992f7874e0b36334f7d68c23fccd09ea48a44293dcd730c",
     "strings.jsonl": "4d43cb54f8434ae3cb4f5bfd73b5207e6f0e4e9babd80440a9374f6b6afa7fd7",
-    "translation.jsonl": "599b3e7a7d27e810faa20943c6c0700628173b145cbe327ef1d0ccc907c04f7b"
+    "translation.jsonl": "c0765798ffba1011a26f790cfde751ab875d480f38d35a6c28b935070310a5f4"
   },
   "pl": {
     "nonempty_pl_text_ids_total": 2110,
@@ -27,6 +27,7 @@
   },
   "strings": 24136,
   "translated_strings": 2110,
+  "translation_records": 24136,
   "unused_text_ids": 595,
   "voice": {
     "unique_prefixes": 68,

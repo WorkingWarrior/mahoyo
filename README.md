@@ -11,11 +11,11 @@ Prosimy o zwrócenie uwagi na fakt, że nie jest to finalne tłumaczenie, a prac
 Projekt publikuje pełny corpus w czterech plikach w katalogu głównym:
 
 - `strings.jsonl` — kanoniczny tekst japoński i angielski, jeden wiersz na `text_id`.
-- `translation.jsonl` — polskie tłumaczenia po `text_id`; występują tylko wiersze z niepustym PL.
+- `translation.jsonl` — pełne rekordy do pracy nad tłumaczeniem: JA, EN, PL oraz lista wszystkich miejsc użycia z kontekstem i metadanymi głosu/mówcy; jeden wiersz na `text_id`.
 - `occurrences.jsonl` — miejsca użycia tekstu w skryptach, kontekst w kolejności źródłowej oraz metadane głosu i prawdopodobnego mówcy.
 - `manifest.json` — wersja formatu, pochodzenie danych, sumy SHA-256 i statystyki.
 
-Pliki `text/Chapter*.json` zostały wycofane. Połączenie danych odbywa się przez `text_id`.
+Pliki `text/Chapter*.json` zostały wycofane. W `translation.jsonl` nieprzetłumaczone teksty mają `pl: null`, a teksty bez miejsca użycia `occurrences: []`. Połączenie danych odbywa się przez `text_id`.
 
 ## Podziękowania
 
