@@ -14,6 +14,7 @@ from mahoyo_export_corpus import (
     iter_corpus_records,
     iter_string_records,
     load_pl_translations,
+    load_translation_jsonl,
 )
 
 
@@ -57,12 +58,10 @@ class ExportUnitTests(unittest.TestCase):
 
     def test_string_is_unique_and_text_stays_out_of_occurrences(self):
         texts = [{"text_id": i, "ja": f"JA {i}", "en": f"EN {i}"} for i in range(3)]
-        strings = list(iter_string_records(texts, {0: "PL 0"}))
+        strings = list(iter_string_records(texts))
         self.assertEqual([row["text_id"] for row in strings], [0, 1, 2])
         self.assertEqual(len(strings), len({row["text_id"] for row in strings}))
-        self.assertEqual(strings[0]["pl"], "PL 0")
-        self.assertIsNone(strings[1]["pl"])
-        self.assertIsNone(strings[0]["status"])
+        self.assertTrue(all(set(row) == {"text_id", "ja", "en"} for row in strings))
         occurrences = list(iter_corpus_records(
             texts, [sample_script(b"_ZM($000000);_ZM($000000);")], {0: "PL 0"}))
         self.assertEqual(len(occurrences), 2)
@@ -90,6 +89,8 @@ class ExportUnitTests(unittest.TestCase):
             self.assertEqual(manifests[0], manifests[1])
             manifest = manifests[0]
             self.assertEqual((manifest["strings"], manifest["occurrences"]), (3, 3))
+            self.assertEqual(manifest["format_version"], 2)
+            self.assertEqual((manifest["translated_strings"], manifest["unused_text_ids"]), (1, 1))
             self.assertEqual(manifest["occurrence_distribution"],
                              {"zero": 1, "one": 1, "more_than_one": 1,
                               "max_occurrences": 2})
@@ -102,15 +103,21 @@ class ExportUnitTests(unittest.TestCase):
             self.assertEqual(manifest["source_sha256"]["script_text.mrg"],
                              hashlib.sha256(b"text source").hexdigest())
             self.assertNotIn(str(root), (outputs[0] / "manifest.json").read_text())
-            for name in ("strings.jsonl", "occurrences.jsonl", "manifest.json"):
+            for name in ("strings.jsonl", "occurrences.jsonl", "translation.jsonl", "manifest.json"):
                 self.assertEqual((outputs[0] / name).read_bytes(),
                                  (outputs[1] / name).read_bytes())
+                if name != "manifest.json":
+                    self.assertEqual(manifest["output_sha256"][name],
+                                     hashlib.sha256((outputs[0] / name).read_bytes()).hexdigest())
             string_rows = [json.loads(line) for line in
                            (outputs[0] / "strings.jsonl").read_text().splitlines()]
             occurrence_rows = [json.loads(line) for line in
                                (outputs[0] / "occurrences.jsonl").read_text().splitlines()]
+            translation_rows = [json.loads(line) for line in
+                                (outputs[0] / "translation.jsonl").read_text().splitlines()]
             self.assertEqual(len(string_rows), manifest["strings"])
             self.assertEqual(len(occurrence_rows), manifest["occurrences"])
+            self.assertEqual(translation_rows, [{"text_id": 0, "pl": "PL 0"}])
             self.assertEqual({r["text_id"] for r in occurrence_rows}, {0, 1})
 
     def test_pl_loader_uses_validated_contiguous_indices(self):
@@ -126,6 +133,35 @@ class ExportUnitTests(unittest.TestCase):
                 {"ja": "JA 2", "en": "edited EN 2", "pl": "PL 2"},
             ]), encoding="utf-8")
             self.assertEqual(load_pl_translations(root, texts), {0: "PL 0", 2: "PL 2"})
+
+    def test_pl_loader_uses_explicit_ids_and_null(self):
+        texts = [{"text_id": i, "ja": f"new JA {i}", "en": f"EN {i}"}
+                 for i in range(3)]
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            file = root / "ChapterA.json"
+            rows = [
+                {"text_id": 0, "ja": "old JA 0", "en": "EN 0", "pl": "PL 0"},
+                {"text_id": 1, "ja": "old JA 1", "en": "EN 1", "pl": None},
+                {"text_id": 2, "ja": "old JA 2", "en": "EN 2", "pl": "  "},
+            ]
+            file.write_text(json.dumps(rows), encoding="utf-8")
+            self.assertEqual(load_pl_translations(root, texts), {0: "PL 0"})
+            rows[2]["text_id"] = 0
+            file.write_text(json.dumps(rows), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Overlapping chapter ranges"):
+                load_pl_translations(root, texts)
+
+    def test_sparse_translation_reload(self):
+        texts = [{"text_id": i, "ja": f"JA {i}", "en": f"EN {i}"} for i in range(2)]
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "translation.jsonl"
+            path.write_text('{"text_id":1,"pl":"  PL  "}\n', encoding="utf-8")
+            self.assertEqual(load_translation_jsonl(path, texts), {1: "  PL  "})
+            path.write_text('{"text_id":1,"pl":"PL"}\n'
+                            '{"text_id":1,"pl":"another"}\n', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicate text_id"):
+                load_translation_jsonl(path, texts)
 
     def test_pl_conflict_is_rejected(self):
         texts = [{"text_id": 0, "ja": "JA 0", "en": "EN 0"}]
@@ -178,7 +214,7 @@ class RealArchiveExportTests(unittest.TestCase):
                             for row in self.rows))
 
     def test_real_strings_and_occurrence_relation(self):
-        strings = list(iter_string_records(self.texts, {}))
+        strings = list(iter_string_records(self.texts))
         string_ids = {row["text_id"] for row in strings}
         self.assertEqual(len(strings), len(string_ids))
         self.assertEqual(len(strings), 24136)

@@ -11,11 +11,10 @@ NEW/
 H/
 TRANSLATED/
 
-# Generated localization data
+# Temporary exports and unreviewed translation suggestions
 mahoyo_project/
-strings.jsonl
-occurrences.jsonl
-manifest.json
+*_AUTOTRANSLATED.json
+tmp/
 
 # Voice and other game audio assets
 *.wav

@@ -1,6 +1,6 @@
 # Narzędzia analizy tłumaczenia Mahoyo
 
-Te skrypty czytają archiwa skryptów z własnego dumpa gry i budują dane pomocne przy tłumaczeniu. Nie modyfikują plików `.mrg`. Dumpy, RomFS/ExeFS, głosy i inne zasoby gry nie są częścią tego repozytorium.
+Te skrypty czytają archiwa skryptów z dumpa gry i budują publiczny corpus tłumaczeniowy. Nie modyfikują plików `.mrg`. Archiwa `.mrg`, RomFS/ExeFS, głosy i inne zasoby binarne gry nie są częścią tego repozytorium.
 
 ## Wymagania i uruchomienie
 
@@ -20,7 +20,7 @@ python tools/mahoyo_context.py 148 \
   --scripts /ścieżka/do/własnego/dumpa/allscr.mrg
 ```
 
-`PYTHONPATH` nie trzeba ustawiać. W środowisku z inną lokalizacją archiwów podaj jawnie `--text`, `--scripts` i, przy imporcie PL, `--pl-dir`; domyślne ścieżki w skryptach odnoszą się do lokalnego środowiska autora.
+`PYTHONPATH` nie trzeba ustawiać. Podaj jawnie `--text`, `--scripts` i, przy imporcie PL ze starych plików, `--pl-dir`; domyślne ścieżki w skryptach odnoszą się do lokalnego środowiska autora.
 
 ## `mahoyo_context.py`
 
@@ -30,27 +30,35 @@ Narzędzie wyszukuje `text_id` w `allscr.mrg` i pokazuje komendę `_ZM`, sąsied
 
 ## `mahoyo_export_corpus.py`
 
-`String` to jednostka tłumaczenia identyfikowana przez `text_id`. `Occurrence` to użycie tego stringa w komendzie skryptu, wskazujące go przez `text_id` i przechowujące miejsce użycia oraz kontekst. Jeden string może mieć wiele occurrences, ale ma jedną wartość PL. Wygeneruj projekt:
+`String` to jednostka tekstu identyfikowana przez `text_id`. `Occurrence` to użycie tego stringa w komendzie skryptu, wskazujące go przez `text_id` i przechowujące miejsce użycia oraz kontekst. Jeden string może mieć wiele occurrences, ale ma najwyżej jedną wartość PL w `translation.jsonl`. Przy migracji z lokalnych kanonicznych plików `Chapter*.json` wygeneruj zestaw w katalogu głównym repo:
 
 ```bash
 python tools/mahoyo_export_corpus.py project \
   --text /ścieżka/do/własnego/dumpa/script_text.mrg \
   --scripts /ścieżka/do/własnego/dumpa/allscr.mrg \
-  --pl-dir /ścieżka/do/roboczych/Chapter-json \
-  --output-dir /tmp/mahoyo_project
+  --pl-dir /ścieżka/do/kanonicznych/Chapter-json \
+  --output-dir .
 ```
 
-`--pl-dir` wskazuje katalog z `Chapter*.json` zawierającymi `ja`, `en`, `pl`. Eksporter dopasowuje całe sekwencje JA do tabeli z gry i dopiero potem przypisuje `text_id`; pusty lub zawierający tylko białe znaki PL staje się `null`. `--no-pl` pomija ten krok. Pliki źródłowe nie są zmieniane.
+`--pl-dir` wskazuje katalog z kanonicznymi `Chapter*.json`. W nowym formacie
+eksporter używa jawnego `text_id`; w starym dopasowuje całe sekwencje JA do
+tabeli z gry. Pusty lub zawierający tylko białe znaki PL nie jest eksportowany.
+`*_AUTOTRANSLATED.json` są pomijane. `--no-pl` tworzy pusty `translation.jsonl`.
+Pliki źródłowe nie są zmieniane. Przy kolejnych eksportach użyj
+`--translation translation.jsonl` zamiast `--pl-dir`, aby zachować bieżące
+polskie zmiany. Eksporter wczytuje tłumaczenie przed zapisaniem plików, więc
+może ono leżeć w katalogu wyjściowym.
 
 Projekt zawiera:
 
-- `strings.jsonl`: jeden rekord na każde `text_id`, także nieużywane; pola `text_id`, `ja`, `en`, `pl` oraz puste początkowo `status`.
+- `strings.jsonl`: jeden rekord na każde `text_id`, także nieużywane; pola `text_id`, `ja`, `en`.
+- `translation.jsonl`: tylko niepuste kanoniczne PL; pola `text_id`, `pl`, bez rekordów z `pl: null`.
 - `occurrences.jsonl`: jeden rekord na użycie w `_ZM`; zawiera `id` (`script:command_index:text_id`), `text_id`, lokalizację, metadane głosu i prawdopodobnego speakera oraz `context_before` i `context_after` jako listy sąsiednich `text_id`. Nie zawiera kopii `ja`, `en` ani `pl`; tekst pobiera się ze `strings.jsonl` przez `text_id`.
-- `manifest.json`: liczniki stringów i occurrences, rozkład użyć, pokrycie PL, szerokość kontekstu oraz SHA-256 wejściowych archiwów. Nie zawiera bezwzględnych ścieżek źródeł.
+- `manifest.json`: wersja formatu, liczniki stringów, occurrences i tłumaczeń, rozkład użyć, szerokość kontekstu oraz SHA-256 archiwów wejściowych i trzech pozostałych plików. Nie zawiera bezwzględnych ścieżek źródeł.
 
 Kontekst wynika z kolejności w źródłowym skrypcie (**source-order**), a nie z gwarantowanej kolejności wykonania w grze (**runtime-flow**). Domyślnie obejmuje trzy sąsiednie komendy `_ZM` z każdej strony; `--context N` zmienia tę liczbę.
 
-Tryb `strings` eksportuje tylko `strings.jsonl`. Tryb bez podkomendy eksportuje pojedynczy plik occurrences, a `--legacy-inline-text` dodaje do niego kopie `ja/en/pl` dla starszych odbiorców. Szczegóły opcji: `python tools/mahoyo_export_corpus.py --help` i `python tools/mahoyo_export_corpus.py project --help`.
+Tryb `strings` eksportuje tylko `strings.jsonl`. Tryb bez podkomendy eksportuje pojedynczy plik occurrences, a `--legacy-inline-text` dodaje do niego kopie `ja/en/pl` dla starszych odbiorców. Publiczny format repo tworzy tryb `project`; stare `Chapter*.json` zostały wycofane. Szczegóły opcji: `python tools/mahoyo_export_corpus.py --help` i `python tools/mahoyo_export_corpus.py project --help`.
 
 ## Testy
 

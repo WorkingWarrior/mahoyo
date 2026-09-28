@@ -6,6 +6,17 @@ Otwartoźródłowe tłumaczenie [Mahōtsukai no Yoru](http://typemoon.com/produc
 
 Prosimy o zwrócenie uwagi na fakt, że nie jest to finalne tłumaczenie, a prace cały czas trwają.
 
+## Dane tłumaczenia
+
+Projekt publikuje pełny corpus w czterech plikach w katalogu głównym:
+
+- `strings.jsonl` — kanoniczny tekst japoński i angielski, jeden wiersz na `text_id`.
+- `translation.jsonl` — polskie tłumaczenia po `text_id`; występują tylko wiersze z niepustym PL.
+- `occurrences.jsonl` — miejsca użycia tekstu w skryptach, kontekst w kolejności źródłowej oraz metadane głosu i prawdopodobnego mówcy.
+- `manifest.json` — wersja formatu, pochodzenie danych, sumy SHA-256 i statystyki.
+
+Pliki `text/Chapter*.json` zostały wycofane. Połączenie danych odbywa się przez `text_id`.
+
 ## Podziękowania
 
 Type-Moon za wydanie tej [gry](http://typemoon.com/products/mahoyo/)!

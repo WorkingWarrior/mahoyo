@@ -1,0 +1,37 @@
+{
+  "context_zm_commands_per_side": 3,
+  "format_version": 2,
+  "occurrence_distribution": {
+    "max_occurrences": 2,
+    "more_than_one": 9,
+    "one": 23532,
+    "zero": 595
+  },
+  "occurrences": 23550,
+  "output_sha256": {
+    "occurrences.jsonl": "ca54cd72c698c031f35d88368f4e31f242c76820dbaf8de352c39cdeaa0879d0",
+    "strings.jsonl": "4d43cb54f8434ae3cb4f5bfd73b5207e6f0e4e9babd80440a9374f6b6afa7fd7",
+    "translation.jsonl": "599b3e7a7d27e810faa20943c6c0700628173b145cbe327ef1d0ccc907c04f7b"
+  },
+  "pl": {
+    "nonempty_pl_text_ids_total": 2110,
+    "nonempty_pl_text_ids_unused": 25,
+    "nonempty_pl_text_ids_used": 2085,
+    "occurrences_referencing_translated_text_ids": 2085
+  },
+  "scripts": 249,
+  "source_order_context": true,
+  "source_sha256": {
+    "allscr.mrg": "8a2fae5f733d04d05844ddf2189a0a5fe5ce4e0b77df1ad52fe3c6f8b8a1b2a1",
+    "script_text.mrg": "940877043f1e8a3049b9862dfd630f5f1151a7c98e4914403853b50e21074c90"
+  },
+  "strings": 24136,
+  "translated_strings": 2110,
+  "unused_text_ids": 595,
+  "voice": {
+    "unique_prefixes": 68,
+    "with_probable_speaker": 9016,
+    "with_voice": 9741
+  },
+  "zm_commands": 22845
+}
