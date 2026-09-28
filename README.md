@@ -21,6 +21,14 @@ Pliki `text/Chapter*.json` zostały wycofane. W `translation.jsonl` nieprzetłum
 
 Type-Moon za wydanie tej [gry](http://typemoon.com/products/mahoyo/)!
 
+## Workflow
+
+1. Eksport: oryginalne `script_text.mrg` i `allscr.mrg` → `strings.jsonl`, `occurrences.jsonl`, `translation.jsonl`, `manifest.json`.
+2. Tłumaczenie: edytuj pole `pl` w `translation.jsonl`.
+3. Import: oryginalne `script_text.mrg` + `strings.jsonl` + `translation.jsonl` + `manifest.json` → nowy `build/script_text.mrg`.
+
+Importer zapisuje polski tekst w angielskim slocie. Brak niepustego PL (`pl: null` w obecnym pełnym formacie albo brak rekordu w formacie sparse) zachowuje oficjalne EN. `occurrences.jsonl` służy tłumaczowi jako kontekst i nie uczestniczy w repacku. Oryginalne archiwum nigdy nie jest nadpisywane.
+
 ## Tooling
 
 Narzędzia do analizy skryptów i eksportu danych tłumaczeniowych opisano w [tools/README.md](tools/README.md).

@@ -1,6 +1,6 @@
 # Narzędzia analizy tłumaczenia Mahoyo
 
-Te skrypty czytają archiwa skryptów z dumpa gry i budują publiczny corpus tłumaczeniowy. Nie modyfikują plików `.mrg`. Archiwa `.mrg`, RomFS/ExeFS, głosy i inne zasoby binarne gry nie są częścią tego repozytorium.
+Eksporter czyta archiwa skryptów z dumpa gry i buduje publiczny corpus tłumaczeniowy. Importer tworzy nowe archiwum z tłumaczeniem. Archiwa `.mrg`, RomFS/ExeFS, głosy i inne zasoby binarne gry nie są częścią tego repozytorium.
 
 ## Wymagania i uruchomienie
 
@@ -59,6 +59,25 @@ Projekt zawiera:
 Kontekst wynika z kolejności w źródłowym skrypcie (**source-order**), a nie z gwarantowanej kolejności wykonania w grze (**runtime-flow**). Domyślnie obejmuje trzy sąsiednie komendy `_ZM` z każdej strony; `--context N` zmienia tę liczbę.
 
 Tryb `strings` eksportuje tylko `strings.jsonl`. Tryb bez podkomendy eksportuje pojedynczy plik occurrences, a `--legacy-inline-text` dodaje do niego kopie `ja/en/pl` dla starszych odbiorców. Publiczny format repo tworzy tryb `project`; stare `Chapter*.json` zostały wycofane. Szczegóły opcji: `python tools/mahoyo_export_corpus.py --help` i `python tools/mahoyo_export_corpus.py project --help`.
+
+## `mahoyo_import_translation.py`
+
+Importer bierze **oryginalne** `script_text.mrg`, sprawdza jego SHA-256 z `manifest.json`, wszystkie 24 136 rekordów JA/EN z `strings.jsonl` oraz tłumaczenie. Przebudowuje tablicę offsetów EN i całe archiwum `mrgd00` przy użyciu writera z submodułu. Przed opublikowaniem pliku wynikowego ponownie go parsuje i porównuje wszystkie pięć języków oraz niezmieniane entries. Nie używa legacy importerów `H/Apply.py` i `H/applier.py`.
+
+```bash
+python tools/mahoyo_import_translation.py \
+  --source /ścieżka/do/własnego/dumpa/script_text.mrg \
+  --strings strings.jsonl \
+  --translation translation.jsonl \
+  --manifest manifest.json \
+  --output build/script_text.mrg
+```
+
+Dodaj `--dry-run`, aby wykonać pełną walidację i repack w pamięci bez zapisu. `--force-source-mismatch` omija wyłącznie kontrolę SHA-256 źródła; zgodność `strings.jsonl` ze źródłem pozostaje wymagana. Importer odrzuca próbę zapisania wyniku w ścieżce źródła. Katalog wyjściowy tworzy automatycznie. Po błędzie walidacji wynik nie jest publikowany.
+
+Obecny `translation.jsonl` jest pełnym widokiem z 24 136 rekordami, z których 2 110 ma PL, a pozostałe mają `pl: null`. Importer obsługuje też format sparse `{ "text_id": ..., "pl": "..." }`; brak rekordu oznacza zachowanie oficjalnego EN. `occurrences.jsonl` nie bierze udziału w repacku. Polski tekst trafia do slotu EN, a JA/ZH/ZH2/KO pozostają logicznie identyczne.
+
+Eksperyment na obecnym archiwum potwierdził, że repack bez zmian przy użyciu przypiętego writera jest bajtowo identyczny. Importer zachowuje także surowe bajty niezmienianych rekordów EN, w tym dwa puste rekordy końcowe bez terminatora CRLF.
 
 ## Testy
 
