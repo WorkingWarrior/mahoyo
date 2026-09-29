@@ -79,6 +79,19 @@ Obecny `translation.jsonl` jest pełnym widokiem z 24 136 rekordami, z któryc
 
 Eksperyment na obecnym archiwum potwierdził, że repack bez zmian przy użyciu przypiętego writera jest bajtowo identyczny. Importer zachowuje także surowe bajty niezmienianych rekordów EN, w tym dwa puste rekordy końcowe bez terminatora CRLF.
 
+## Weblate
+
+Adapter tools/mahoyo_weblate.py używa wyłącznie biblioteki standardowej Pythona. JSONL pozostaje źródłem danych:
+
+    python tools/mahoyo_weblate.py validate
+    python tools/mahoyo_weblate.py export
+    python tools/mahoyo_weblate.py validate --po weblate/pl.po
+    python tools/mahoyo_weblate.py import
+
+Eksport tworzy weblate/mahoyo.pot (JA jako msgid), weblate/en.po (EN jako msgstr) i weblate/pl.po (PL jako msgstr). W Weblate ustaw język źródłowy na japoński, dodatkowy język na angielski, a język docelowy na polski. Dla usługi LLM wybierz japoński jako język źródła tłumaczenia.
+
+msgctxt zawiera wyłącznie stabilne text_id i kanonicznego mówcę (`speaker=unknown`, gdy nie ma jednoznacznego przypisania). Komentarze #. podają metadane każdego occurrence osobno, w tym japońską nazwę mówcy, głos, źródło i pewność przypisania oraz scenę; #: wskazuje skrypt i indeks komendy. Wiele occurrences jednego text_id nadal tworzy jeden wpis PO i jedno tłumaczenie PL. Import wymaga pełnego pl.po, sprawdza każde text_id i japoński tekst źródłowy oraz odrzuca wpisy fuzzy. Pusty msgstr wraca jako pl: null. Zapis aktualizuje tylko pole pl w translation.jsonl; pozostałe pola i niezmienione wiersze są zachowywane. Opcje --strings, --translation, --occurrences, --output-dir i --po pozwalają pracować na kopii danych.
+
 ## Testy
 
 ```bash
