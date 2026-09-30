@@ -1,10 +1,5 @@
 msgid ""
-msgstr ""
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Source-Language: ja\n"
-"Language: pl\n"
+msgstr "MIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Source-Language: ja\nLanguage: pl\nPO-Revision-Date: 2026-09-30 21:30+0000\nPlural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #. Occurrence 1_0:49:0: scene=1_0
 #: 1_0:49
@@ -348,7 +343,7 @@ msgstr "  \"Ten kotek potrzebuje naszej pomocy\" – błagała."
 #: 1_0:759
 msgctxt "text_id=57 | speaker=unknown"
 msgid "　魔法使いはおやすいご用だとも、"
-msgstr "  Dziadek nie wspomniał czy było to trudne zadanie,"
+msgstr "　Czarodziej nie wspomniał, czy to łatwe zadanie,"
 
 #. Occurrence 1_0:764:58: scene=1_0
 #: 1_0:764
@@ -360,7 +355,7 @@ msgstr "czy herkulesowy trud."
 #: 1_0:770
 msgctxt "text_id=59 | speaker=unknown"
 msgid "　まるで機械みたいにあっさりと、彼女の身勝手な願いを叶えてやった。"
-msgstr "  Po prostu, niczym maszyna, spełnił życzenie dziewczynki."
+msgstr "　Po prostu, niczym maszyna, spełnił jej samolubne życzenie."
 
 #. Occurrence 1_0:854:60: speaker=aoko; speaker_ja=青子; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=A11_1_0_0000; voice_prefix=A11; voice_category=1; scene=1_0
 #: 1_0:854
@@ -378,73 +373,73 @@ msgstr "  Po chwili zorientowała się, że trzyma w rękach malutkie zwłoki."
 #: 1_0:865
 msgctxt "text_id=62 | speaker=unknown"
 msgid "　冷えきった毛なみ。"
-msgstr "  Futro było zimne."
+msgstr "　Futro było zupełnie zimne."
 
 #. Occurrence 1_0:870:63: scene=1_0
 #: 1_0:870
 msgctxt "text_id=63 | speaker=unknown"
 msgid "　とうに命の温度は消えていた。"
-msgstr "  Ciepło życia opuściło jego ciało."
+msgstr "　Ciepło życia już dawno opuściło jego ciało."
 
 #. Occurrence 1_0:875:64: scene=1_0
 #: 1_0:875
 msgctxt "text_id=64 | speaker=unknown"
 msgid "　流すまいと<律|りっ>していた涙が、瞳からこぼれている。"
-msgstr " A łzy, które tak usilnie starała się powstrzymać, popłynęły z jej oczu."
+msgstr "　Łzy, które tak usilnie starała się powstrzymać, popłynęły z jej oczu."
 
 #. Occurrence 1_0:881:65: scene=1_0
 #: 1_0:881
 msgctxt "text_id=65 | speaker=unknown"
 msgid "　胸には灰色の空みたいに果てのない、大きすぎる後悔の念。"
-msgstr "  Żal rozlał się w jej piersi niczym bezkresne szare niebo."
+msgstr "　Przytłaczający żal rozlał się w jej piersi, bezkresny niczym szare niebo."
 
 #. Occurrence 1_0:915:66: voice_id=F60_1_0_0001; voice_prefix=F60; voice_category=0; scene=1_0
 #: 1_0:915
 msgctxt "text_id=66 | speaker=unknown"
 msgid "『徒労だったな。結局、元に戻すとは』"
-msgstr "\"Spóźniliśmy się. Niektórych rzeczy nie da się cofnąć\"."
+msgstr "\"Próżny trud. Niektórych rzeczy nie da się cofnąć\"."
 
 #. Occurrence 1_0:947:67: scene=1_0
 #: 1_0:947
 msgctxt "text_id=67 | speaker=unknown"
 msgid "　何が起こったのか、彼女には把握できない。"
-msgstr "  Jej umysł z trudem dochodził do tego, co się właśnie wydarzyło."
+msgstr "　Nie potrafiła pojąć, co się właśnie wydarzyło."
 
 #. Occurrence 1_0:967:68: scene=1_0
 #: 1_0:967
 msgctxt "text_id=68 | speaker=unknown"
 msgid "　この十分間の空白に何を経験して、"
-msgstr "  Ostatnie dziesięć minut było totalną pustką."
+msgstr "　Co przeżyła podczas tych dziesięciu minut pustki,"
 
 #. Occurrence 1_0:972:69: scene=1_0
 #: 1_0:972
 msgctxt "text_id=69 | speaker=unknown"
 msgid "　誰と出会い、"
-msgstr "  Kogo spotkała..."
+msgstr "　kogo spotkała,"
 
 #. Occurrence 1_0:977:70: scene=1_0
 #: 1_0:977
 msgctxt "text_id=70 | speaker=unknown"
 msgid "　何を知ったのかも、無責任にも元通り。"
-msgstr "  Czego się dowiedziała... Jakby nic się nie wydarzyło."
+msgstr "　czego się dowiedziała... Jakby nic się nie wydarzyło."
 
 #. Occurrence 1_0:982:71: scene=1_0
 #: 1_0:982
 msgctxt "text_id=71 | speaker=unknown"
 msgid "　確かなコトは、死に行く命は戻らないという事と、"
-msgstr "  Jedyną rzeczą, której była pewna, to to, że życia, raz zgaszonego, nigdy nie uda się już rozpalić."
+msgstr "　Była pewna jedynie tego, że gasnącego życia nie da się przywrócić, oraz tego,"
 
 #. Occurrence 1_0:994:72: speaker=aoko; speaker_ja=青子; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=A11_1_0_0001; voice_prefix=A11; voice_category=1; scene=1_0
 #: 1_0:994
 msgctxt "text_id=72 | speaker=aoko"
 msgid "　　　　「あの―――そこにだれか、いるの？」"
-msgstr "        \"Czy jest tam ktoś?\""
+msgstr "　　　　„Eee… Czy ktoś tam jest?”"
 
 #. Occurrence 1_0:1001:73: scene=1_0
 #: 1_0:1001
 msgctxt "text_id=73 | speaker=unknown"
 msgid "　その日。"
-msgstr "  Tego dnia..."
+msgstr "　Tego dnia"
 
 #. Occurrence 1_0:1006:74: scene=1_0
 #: 1_0:1006
@@ -20165,8 +20160,8 @@ msgid "　だから出来るだけ春先までのんびりしてて、あんな�
 msgstr ""
 
 #. Occurrence 4_2:387:3376: speaker=aoko; speaker_ja=青子; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=A10_4_2_0004_0; voice_prefix=A10; voice_category=1; scene=4_2
-#: 4_2:387
 #. Occurrence 4_2:395:3376: scene=4_2
+#: 4_2:387
 #: 4_2:395
 msgctxt "text_id=3376 | speaker=aoko"
 msgid "ありがとうのひとつも無いってのは、ちょっと癪にさわるわよね。"
@@ -52919,8 +52914,8 @@ msgid "　なにより、先立つものがないのが致命的だ。"
 msgstr ""
 
 #. Occurrence 7_1:5963:8852: speaker=kinomi; speaker_ja=木乃美; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=B50_7_1_0022_0; voice_prefix=B50; voice_category=6; scene=7_1
-#: 7_1:5963
 #. Occurrence 7_1:5970:8852: scene=7_1
+#: 7_1:5963
 #: 7_1:5970
 msgctxt "text_id=8852 | speaker=kinomi"
 msgid "“あとは……まあ、<見|ケン>ってヤツ？"
@@ -102249,56 +102244,56 @@ msgid "　私はこんなにも、コイツを助けたがってる……！！�
 msgstr ""
 
 #. Occurrence C_10:3392:17164: speaker=aoko; speaker_ja=青子; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=A10_C_10_0011; voice_prefix=A10; voice_category=1; scene=C_10
-#: C_10:3392
 #. Occurrence C_10:4183:17164: speaker=aoko; speaker_ja=青子; speaker_source=voice_category_map; speaker_confidence=probable; voice_id=A10_C_10_0011; voice_prefix=A10; voice_category=1; scene=C_10
+#: C_10:3392
 #: C_10:4183
 msgctxt "text_id=17164 | speaker=aoko"
 msgid "「―――<全て|not,>は<正し|SANE>く」"
 msgstr ""
 
 #. Occurrence C_10:3398:17165: scene=C_10
-#: C_10:3398
 #. Occurrence C_10:4189:17165: scene=C_10
+#: C_10:3398
 #: C_10:4189
 msgctxt "text_id=17165 | speaker=unknown"
 msgid "　沸き上がる青い旋風。"
 msgstr ""
 
 #. Occurrence C_10:3403:17166: scene=C_10
-#: C_10:3403
 #. Occurrence C_10:4194:17166: scene=C_10
+#: C_10:3403
 #: C_10:4194
 msgctxt "text_id=17166 | speaker=unknown"
 msgid "　迷いも<憂|うれ>いも捨てさった瞳で、魔法使いは世界を相手にペテンを始める。"
 msgstr ""
 
 #. Occurrence C_10:3509:17167: scene=C_10
-#: C_10:3509
 #. Occurrence C_10:4291:17167: scene=C_10
+#: C_10:3509
 #: C_10:4291
 msgctxt "text_id=17167 | speaker=unknown"
 msgid "　逆行する時間。"
 msgstr ""
 
 #. Occurrence C_10:3750:17168: scene=C_10
-#: C_10:3750
 #. Occurrence C_10:4512:17168: scene=C_10
+#: C_10:3750
 #: C_10:4512
 msgctxt "text_id=17168 | speaker=unknown"
 msgid "　書き換えられる原風景。"
 msgstr ""
 
 #. Occurrence C_10:4049:17169: scene=C_10
-#: C_10:4049
 #. Occurrence C_10:4760:17169: scene=C_10
+#: C_10:4049
 #: C_10:4760
 msgctxt "text_id=17169 | speaker=unknown"
 msgid "　見れば、それは白い花だった。"
 msgstr ""
 
 #. Occurrence C_10:4054:17170: scene=C_10
-#: C_10:4054
 #. Occurrence C_10:4765:17170: scene=C_10
+#: C_10:4054
 #: C_10:4765
 msgctxt "text_id=17170 | speaker=unknown"
 msgid "　雪よりも真白い野花の<群|むれ>は、さざ波のように世界を侵食していき、そして―――"
