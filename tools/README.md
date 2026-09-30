@@ -88,9 +88,28 @@ Adapter tools/mahoyo_weblate.py używa wyłącznie biblioteki standardowej Pytho
     python tools/mahoyo_weblate.py validate --po weblate/pl.po
     python tools/mahoyo_weblate.py import
 
-Eksport tworzy weblate/mahoyo.pot (JA jako msgid), weblate/en.po (EN jako msgstr) i weblate/pl.po (PL jako msgstr). W Weblate ustaw język źródłowy na japoński, dodatkowy język na angielski, a język docelowy na polski. Dla usługi LLM wybierz japoński jako język źródła tłumaczenia.
+Ten starszy tryb eksportu tworzy weblate/mahoyo.pot (JA jako msgid), weblate/en.po (EN jako msgstr) i weblate/pl.po (PL jako msgstr). Dotyczy komponentu ze źródłem JA i pozostaje dostępny do odtworzenia starego zestawu.
 
 msgctxt zawiera wyłącznie stabilne text_id i kanonicznego mówcę (`speaker=unknown`, gdy nie ma jednoznacznego przypisania). Komentarze #. podają metadane każdego occurrence osobno, w tym japońską nazwę mówcy, głos, źródło i pewność przypisania oraz scenę; #: wskazuje skrypt i indeks komendy. Wiele occurrences jednego text_id nadal tworzy jeden wpis PO i jedno tłumaczenie PL. Import wymaga pełnego pl.po, sprawdza każde text_id i japoński tekst źródłowy oraz odrzuca wpisy fuzzy. Pusty msgstr wraca jako pl: null. Zapis aktualizuje tylko pole pl w translation.jsonl; pozostałe pola i niezmienione wiersze są zachowywane. Opcje --strings, --translation, --occurrences, --output-dir i --po pozwalają pracować na kopii danych.
+
+## Weblate ze źródłem EN
+
+Nowy adapter tools/mahoyo_weblate_en.py wymaga biblioteki polib:
+
+    python -m pip install -r tools/requirements-weblate.txt
+
+Eksportuj z Weblate starego komponentu aktualne ja.po, en.po i pl.po do osobnego katalogu. Zablokuj edycję starego komponentu na czas końcowego pobrania. Lokalna wersja PL w translation.jsonl może być starsza od Weblate, więc generator bierze PL wyłącznie z pobranego pl.po:
+
+    python tools/mahoyo_weblate_en.py export --snapshot-dir /ścieżka/do/pobranego-zestawu --exclude-empty-unused
+    python tools/mahoyo_weblate_en.py validate --snapshot-dir /ścieżka/do/pobranego-zestawu --exclude-empty-unused
+
+Wynikiem są weblate-en/mahoyo.pot, weblate-en/ja.po, weblate-en/pl.po oraz migration-manifest.json. Źródłowy msgid to dokładny EN z Weblate, JA trafia do msgstr w ja.po, a PL z Weblate do msgstr w pl.po. Generator łączy wpisy po text_id, zachowuje msgctxt, komentarze, locations i flagi PL, w tym fuzzy; zatrzymuje się przy brakujących identyfikatorach, zmienionym EN, liczbie mnogiej oraz flagach formatu wymagających ręcznej kontroli. Opcja --exclude-empty-unused pomija tylko nieużywane rekordy z pustymi JA/EN/PL; obecnie są to text_id 24134 i 24135. Nadal pozostają one w JSONL.
+
+Po zmianach w nowym komponencie można zsynchronizować jego PL do kanonicznego translation.jsonl:
+
+    python tools/mahoyo_weblate_en.py import --exclude-empty-unused
+
+Import sprawdza text_id oraz dokładny angielski msgid. Zmienia tylko pole pl; przy fuzzy przerywa, bo JSONL nie ma pola statusu. Narzędzie mahoyo_import_translation.py nadal używa text_id z translation.jsonl do eksportu gry, więc nie zależy od języka msgid. Sam eksport EN nie zmienia zasobów gry.
 
 ## Testy
 
