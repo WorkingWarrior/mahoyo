@@ -1,0 +1,17 @@
+{
+  "source": "Weblate JA/EN/PL snapshot",
+  "source_language": "en",
+  "string_count": 24136,
+  "po_entry_count": 24134,
+  "excluded_unused_empty_ids": [
+    24134,
+    24135
+  ],
+  "snapshot_sha256": {
+    "ja": "a96487697e87ff547833415d186f44d37165934487f945c86e832d5ead5ae814",
+    "en": "8eb55fa18662adb7bc07c1345c5d7718229280c4ce72a7e1723c576a8b362740",
+    "pl": "daa6efbcec2ce2ab19712feeb88c31df6cb2660468c67212b1f5d427f884446a"
+  },
+  "pl_translated": 2110,
+  "pl_fuzzy": 0
+}
